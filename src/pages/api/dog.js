@@ -1,13 +1,13 @@
 // pages/api/dog.js
 export default function handler(req, res) {
     res.status(200).json([
-        { src: '/dogs/dog1.jpg', alt: 'dog', width: 500, height: 500 },
-        { src: '/dogs/dog2.jpg', alt: 'dog', width: 500, height: 500 },
-        { src: '/dogs/dog3.jpg', alt: 'dog', width: 500, height: 500 },
-        { src: '/dogs/dog4.jpg', alt: 'dog', width: 500, height: 500 },
-        { src: '/dogs/dog5.jpg', alt: 'dog', width: 500, height: 500 },
-        { src: '/dogs/dog6.jpg', alt: 'dog', width: 500, height: 500 },
-        { src: '/dogs/dog7.jpg', alt: 'dog', width: 500, height: 500 },
-        { src: '/dogs/dog8.jpg', alt: 'dog', width: 500, height: 500 }
+        { src: '/dogs/dog1.jpg', alt: 'dog1', width: 500, height: 500, description: 'these id the description of the first dog' },
+        { src: '/dogs/dog2.jpg', alt: 'dog2', width: 500, height: 500, description: 'these id the description of the second dog' },
+        { src: '/dogs/dog3.jpg', alt: 'dog3', width: 500, height: 500, description: 'these id the description of the third dog' },
+        { src: '/dogs/dog4.jpg', alt: 'dog4', width: 500, height: 500, description: 'these id the description of the forth dog' },
+        { src: '/dogs/dog5.jpg', alt: 'dog5', width: 500, height: 500, description: 'these id the description of the fifth dog' },
+        { src: '/dogs/dog6.jpg', alt: 'dog6', width: 500, height: 500, description: 'these id the description of the sex dog' },
+        { src: '/dogs/dog7.jpg', alt: 'dog7', width: 500, height: 500, description: 'these id the description of the seven dog' },
+        { src: '/dogs/dog8.jpg', alt: 'dog8', width: 500, height: 500, description: 'these id the description of the eight dog' }
     ]);
 }

@@ -23,10 +23,11 @@ function SidebarItem({ animal, onClick, isSelected }) {
 export default function Home() {
     const [selectedAnimal, setSelectedAnimal] = useState(null);
     const [animalData, setAnimalData] = useState([]);
+    const [selectedImageAlt, setSelectedImageAlt] = useState(null);
 
     const handleAnimalClick = async (animal) => {
         setSelectedAnimal(animal);
-
+        setSelectedImageAlt(null);
         try {
             const response = await fetch(`/api/${animal.toLowerCase()}`);
             if (!response.ok) {
@@ -39,6 +40,8 @@ export default function Home() {
             console.error('Error fetching data:', error);
         }
     };
+
+    const selectedImageData = selectedImageAlt ? animalData.find((image) => image.alt === selectedImageAlt) : null;
 
     return (
         <div className="flex flex-col md:flex-row">
@@ -72,6 +75,7 @@ export default function Home() {
                                 width={image.width}
                                 height={image.height}
                                 layout="responsive"
+                                onClick={() => setSelectedImageAlt(image.alt)} // Save the image alt on click
                             />
                         </div>
                     ))}
@@ -85,7 +89,12 @@ export default function Home() {
                 </div>
                 <div className="md:w-1/2 p-5 border-4">
                     <div className="w-full h-full flex justify-center items-center">
-                        {selectedAnimal && <div className="w-[90%] mt-[20%] h-1/3 border-2">display info for {selectedAnimal}</div>}
+                        {selectedImageData && (
+                            <div className="w-[90%] mt-[20%] h-1/3 border-2">
+                                {/* Display the description for the selected image */}
+                                {selectedImageData.description}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
