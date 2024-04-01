@@ -1,34 +1,47 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 
 const animalTypes = ['Dog', 'Cat', 'Horse'];
-
-const images = [
-    { src: '/favicon.ico', alt: 'fav', width: 500, height: 500 },
-    { src: '/favicon.ico', alt: 'fav', width: 500, height: 500 },
-    { src: '/favicon.ico', alt: 'fav', width: 500, height: 500 },
-    { src: '/favicon.ico', alt: 'fav', width: 500, height: 500 }
-];
 
 function SidebarItem({ animal, onClick, isSelected }) {
     const baseStyle = 'block flex-1 text-center md:text-left p-2 hover:bg-gray-200';
     const selectedStyle = isSelected ? 'bg-gray-300' : '';
     return (
-        <a href="#" className={`${baseStyle} ${selectedStyle}`} onClick={onClick}>
+        <Link
+            href="#"
+            className={`${baseStyle} ${selectedStyle}`}
+            onClick={(e) => {
+                e.preventDefault(); // Prevent default link behavior
+                onClick(animal); // Call the passed onClick handler with the animal name
+            }}>
             {animal}
-        </a>
+        </Link>
     );
 }
 
 export default function Home() {
     const [selectedAnimal, setSelectedAnimal] = useState(null);
+    const [animalData, setAnimalData] = useState([]);
 
-    const handleAnimalClick = (animal) => {
+    const handleAnimalClick = async (animal) => {
         setSelectedAnimal(animal);
+
+        try {
+            const response = await fetch(`/api/${animal.toLowerCase()}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            setAnimalData(data);
+            console.log('data =', data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     };
 
     return (
-        <div className="flex flex-col md:flex-row h-screen">
+        <div className="flex flex-col md:flex-row">
             <div className="md:flex md:flex-col md:w-1/4 lg:w-1/6 p-4 border-r">
                 <div className="mb-4">
                     <div className="flex flex-row md:flex-col">
@@ -37,22 +50,20 @@ export default function Home() {
                                 key={animal}
                                 animal={animal}
                                 isSelected={selectedAnimal === animal}
-                                onClick={(e) => {
-                                    e.preventDefault();
+                                onClick={() => {
                                     handleAnimalClick(animal);
                                 }}
                             />
                         ))}
                     </div>
                 </div>
-                {/* Additional content can be added here */}
             </div>
             <div className="border-4 lg:w-1/2 p-2">
                 <div className="mb-4">
-                    <input type="search" placeholder="search" className="w-full p-2 border" />{' '}
+                    <input type="search" placeholder="search" className="w-full p-2 border" />
                 </div>
-                <div className="flex flex-wrap -mx-2 w-full">
-                    {images.map((image, index) => (
+                <div className="flex flex-wrap -mx-2 w-full scroll-m-0">
+                    {animalData.map((image, index) => (
                         <div key={index} className="px-2 w-1/2">
                             <Image
                                 src={image.src}
@@ -66,7 +77,7 @@ export default function Home() {
                     ))}
                 </div>
             </div>
-            <div className="md:flex md:flex-row md:w-1/4 lg:w-full h-[100vh]">
+            <div className="md:flex md:flex-row md:w-1/4 lg:w-full">
                 <div className="md:w-1/2 p-5 border-4">
                     <div className="w-full h-full flex justify-center items-center">
                         {selectedAnimal && <div className="w-[90%] mt-[20%] h-1/3 border-2">display video for {selectedAnimal}</div>}
