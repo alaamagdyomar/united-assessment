@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import React, { useState, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import SidebarItem from '../components/SidebarItem';
+import SidebarItem from '../components/SideBarItem';
 import axios from 'axios';
 
 const Video = dynamic(() => import('next-video'), { ssr: false, loading: () => <p>Loading...</p> });
