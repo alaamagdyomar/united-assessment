@@ -25,10 +25,12 @@ export default function Home() {
     const [selectedAnimal, setSelectedAnimal] = useState(null);
     const [animalData, setAnimalData] = useState([]);
     const [selectedImageAlt, setSelectedImageAlt] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleAnimalClick = async (animal) => {
         setSelectedAnimal(animal);
         setSelectedImageAlt(null);
+        setSearchTerm('');
         try {
             const response = await fetch(`/api/${animal.toLowerCase()}`);
             if (!response.ok) {
@@ -43,9 +45,14 @@ export default function Home() {
     };
 
     const selectedImageData = selectedImageAlt ? animalData.find((image) => image.alt === selectedImageAlt) : null;
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const filteredAnimalData = animalData.filter((image) => image.alt.toLowerCase().includes(searchTerm.toLowerCase()));
 
     return (
-        <div className="flex flex-col md:flex-row">
+        <div className="flex flex-col md:flex-row h-screen">
             <div className="md:flex md:flex-col md:w-1/4 lg:w-1/6 p-4 border-r">
                 <div className="mb-4">
                     <div className="flex flex-row md:flex-col">
@@ -64,10 +71,10 @@ export default function Home() {
             </div>
             <div className="border-4 lg:w-1/2 p-2">
                 <div className="mb-4">
-                    <input type="search" placeholder="search" className="w-full p-2 border" />
+                    <input type="search" placeholder="search" className="w-full p-2 border" onChange={handleSearch} />
                 </div>
                 <div className="flex flex-wrap -mx-2 w-full scroll-m-0">
-                    {animalData.map((image, index) => (
+                    {filteredAnimalData.map((image, index) => (
                         <div key={index} className="px-2 w-1/2">
                             <Image
                                 src={image.src}
