@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import Video from 'next-video';
 
 const animalTypes = ['Dog', 'Cat', 'Horse'];
 
@@ -84,7 +85,12 @@ export default function Home() {
             <div className="md:flex md:flex-row md:w-1/4 lg:w-full">
                 <div className="md:w-1/2 p-5 border-4">
                     <div className="w-full h-full flex justify-center items-center">
-                        {selectedAnimal && <div className="w-[90%] mt-[20%] h-1/3 border-2">display video for {selectedAnimal}</div>}
+                        {selectedImageData && (
+                            <div className="w-[90%] mt-[20%] h-1/3 border-2">
+                                {/* Display the description for the selected image */}
+                                <Video className="max-w-4xl" src={selectedImageData.videoPath} />
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className="md:w-1/2 p-5 border-4">
