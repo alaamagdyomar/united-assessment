@@ -8,11 +8,7 @@ type Cat = {
     description: string;
     videoPath: string;
 };
-export default function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<Cat[]>
-    ) 
-    {
+export default function handler(req: NextApiRequest, res: NextApiResponse<Cat[]>) {
     res.status(200).json([
         {
             src: '/cats/cat1.jpg',

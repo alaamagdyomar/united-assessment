@@ -9,10 +9,7 @@ type Horse = {
     description: string;
     videoPath: string;
 };
-export default function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<Horse[]>
-    ) {
+export default function handler(req: NextApiRequest, res: NextApiResponse<Horse[]>) {
     res.status(200).json([
         {
             src: '/horses/horse1.jpg',

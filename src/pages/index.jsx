@@ -1,25 +1,12 @@
 import Image from 'next/image';
-import Link from 'next/link';
-import { useState } from 'react';
-import Video from 'next-video';
+import React, { useState, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
+import SidebarItem from '../components/SidebarItem';
+import axios from 'axios';
+
+const Video = dynamic(() => import('next-video'), { ssr: false, loading: () => <p>Loading...</p> });
 
 const animalTypes = ['Dog', 'Cat', 'Horse'];
-
-function SidebarItem({ animal, onClick, isSelected }) {
-    const baseStyle = 'block flex-1 text-center md:text-left p-2 hover:bg-gray-200';
-    const selectedStyle = isSelected ? 'bg-gray-300' : '';
-    return (
-        <Link
-            href="#"
-            className={`${baseStyle} ${selectedStyle}`}
-            onClick={(e) => {
-                e.preventDefault(); // Prevent default link behavior
-                onClick(animal); // Call the passed onClick handler with the animal name
-            }}>
-            {animal}
-        </Link>
-    );
-}
 
 export default function Home() {
     const [selectedAnimal, setSelectedAnimal] = useState(null);
@@ -27,29 +14,37 @@ export default function Home() {
     const [selectedImageAlt, setSelectedImageAlt] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
-    const handleAnimalClick = async (animal) => {
-        setSelectedAnimal(animal);
-        setSelectedImageAlt(null);
-        setSearchTerm('');
-        try {
-            const response = await fetch(`/api/${animal.toLowerCase()}`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+    const handleAnimalClick = useCallback(
+        async (animal) => {
+            setSelectedAnimal(animal);
+            setSelectedImageAlt(null);
+            setSearchTerm('');
+            try {
+                // Using Axios to make the GET request
+                const response = await axios.get(`/api/${animal.toLowerCase()}`);
+                // Axios automatically parses the JSON, so you can directly access `response.data`
+                setAnimalData(response.data);
+            } catch (error) {
+                // Axios wraps errors in an error.response object, so you might want to adjust how you handle errors
+                // Logging the error message
+                console.error('Error fetching data:', error.message);
             }
-            const data = await response.json();
-            setAnimalData(data);
-            console.log('data =', data);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
+        },
+        [setSelectedAnimal, setSelectedImageAlt, setSearchTerm, setAnimalData]
+    );
 
-    const selectedImageData = selectedImageAlt ? animalData.find((image) => image.alt === selectedImageAlt) : null;
-    const handleSearch = (e) => {
+    const handleSearch = useCallback((e) => {
         setSearchTerm(e.target.value);
-    };
+    }, []);
 
-    const filteredAnimalData = animalData.filter((image) => image.alt.toLowerCase().includes(searchTerm.toLowerCase()));
+    const filteredAnimalData = useMemo(
+        () => animalData.filter((image) => image.alt.toLowerCase().includes(searchTerm.toLowerCase())),
+        [animalData, searchTerm]
+    );
+    const selectedImageData = useMemo(
+        () => (selectedImageAlt ? animalData.find((image) => image.alt === selectedImageAlt) : null),
+        [animalData, selectedImageAlt]
+    );
 
     return (
         <div className="flex flex-col md:flex-row h-screen">
@@ -61,9 +56,7 @@ export default function Home() {
                                 key={animal}
                                 animal={animal}
                                 isSelected={selectedAnimal === animal}
-                                onClick={() => {
-                                    handleAnimalClick(animal);
-                                }}
+                                onClick={() => handleAnimalClick(animal)}
                             />
                         ))}
                     </div>
@@ -71,7 +64,7 @@ export default function Home() {
             </div>
             <div className="border-4 lg:w-1/2 p-2">
                 <div className="mb-4">
-                    <input type="search" placeholder="search" className="w-full p-2 border" onChange={handleSearch} />
+                    <input type="search" placeholder="Search" className="w-full p-2 border" onChange={handleSearch} />
                 </div>
                 <div className="flex flex-wrap -mx-2 w-full scroll-m-0">
                     {filteredAnimalData.map((image, index) => (
@@ -83,33 +76,29 @@ export default function Home() {
                                 width={image.width}
                                 height={image.height}
                                 layout="responsive"
-                                onClick={() => setSelectedImageAlt(image.alt)} // Save the image alt on click
+                                onClick={() => setSelectedImageAlt(image.alt)}
                             />
                         </div>
                     ))}
                 </div>
             </div>
             <div className="md:flex md:flex-row md:w-1/4 lg:w-full">
-                <div className="md:w-1/2 p-5 border-4">
-                    <div className="w-full h-full flex justify-center items-center">
-                        {selectedImageData && (
-                            <div className="w-[90%] mt-[20%] h-1/3 border-2">
-                                {/* Display the description for the selected image */}
-                                <Video className="max-w-4xl" src={selectedImageData.videoPath} />
+                {selectedImageData && (
+                    <>
+                        <div className="md:w-1/2 p-5 border-4">
+                            <div className="w-full h-full flex justify-center items-center">
+                                <div className="w-[90%] mt-[20%] h-1/3 border-2">
+                                    <Video className="max-w-4xl" src={selectedImageData.videoPath} />
+                                </div>
                             </div>
-                        )}
-                    </div>
-                </div>
-                <div className="md:w-1/2 p-5 border-4">
-                    <div className="w-full h-full flex justify-center items-center">
-                        {selectedImageData && (
-                            <div className="w-[90%] mt-[20%] h-1/3 border-2">
-                                {/* Display the description for the selected image */}
-                                {selectedImageData.description}
+                        </div>
+                        <div className="md:w-1/2 p-5 border-4">
+                            <div className="w-full h-full flex justify-center items-center">
+                                <div className="w-[90%] mt-[20%] h-1/3 border-2">{selectedImageData.description}</div>
                             </div>
-                        )}
-                    </div>
-                </div>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
